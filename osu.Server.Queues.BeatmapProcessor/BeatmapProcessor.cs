@@ -40,6 +40,7 @@ namespace osu.Server.Queues.BeatmapProcessor
                     calculator.ProcessBeatmap(working, processingMode);
                 }
 
+                calculator.ProcessBeatmapSet(item.beatmapset_id);
                 calculator.NotifyBeatmapSetReprocessed(item.beatmapset_id);
             }
         }

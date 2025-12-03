@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using Dapper;
 using MySqlConnector;
 using osu.Game.Beatmaps;
@@ -14,6 +15,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Scoring.Legacy;
+using osu.Game.Utils;
 using osu.Server.DifficultyCalculator.Commands;
 using osu.Server.QueueProcessor;
 
@@ -85,6 +87,50 @@ namespace osu.Server.DifficultyCalculator
                     {
                         beatmap_id = beatmapId,
                     });
+            }
+        }
+
+        public void ProcessBeatmapSet(long beatmapSetId)
+        {
+            if (dryRun)
+                return;
+
+            using (var conn = DatabaseAccess.GetConnection())
+            {
+                var beatmaps = conn.Query<osu_beatmap>(
+                                       @"SELECT `beatmap_id`, `diff_size`, `playmode`, `version`, `difficultyrating` FROM `osu_beatmaps` WHERE `beatmapset_id` = @setId",
+                                       new { setId = beatmapSetId })
+                                   .OrderBy(b => b.playmode).ThenBy(b => b.difficultyrating)
+                                   .ToArray();
+
+                var stringBuilder = new StringBuilder();
+
+                for (int i = 0; i < beatmaps.Length; i++)
+                {
+                    if (i > 0)
+                        stringBuilder.Append(',');
+
+                    var beatmap = beatmaps[i];
+
+                    if (beatmap.playmode == 3)
+                    {
+                        stringBuilder.Append('[');
+                        stringBuilder.Append(beatmap.diff_size);
+                        stringBuilder.Append("k] ");
+                    }
+
+                    stringBuilder.Append(beatmap.version.Replace(",", ""));
+                    stringBuilder.Append(" ★");
+                    stringBuilder.Append(FormatUtils.FormatStarRating(beatmap.difficultyrating).ToString());
+                    stringBuilder.Append('@');
+                    stringBuilder.Append(beatmap.playmode);
+                }
+
+                conn.Execute(@"UPDATE IGNORE `osu_beatmapsets` SET `difficulty_names` = @names WHERE `beatmapset_id` = @setId", new
+                {
+                    names = stringBuilder.ToString(),
+                    setId = beatmapSetId
+                });
             }
         }
 
