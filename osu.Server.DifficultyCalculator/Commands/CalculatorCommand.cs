@@ -98,7 +98,7 @@ namespace osu.Server.DifficultyCalculator.Commands
                             // ensure the correct online id is set
                             beatmap.BeatmapInfo.OnlineID = beatmapId;
 
-                            calc.Process(beatmap, ProcessingMode);
+                            calc.ProcessBeatmap(beatmap, ProcessingMode);
                             if (!NoNotifyProcessing)
                                 calc.NotifyBeatmapReprocessed(beatmapId);
 

@@ -43,21 +43,21 @@ namespace osu.Server.DifficultyCalculator
             }
         }
 
-        public void Process(WorkingBeatmap beatmap, ProcessingMode mode)
+        public void ProcessBeatmap(WorkingBeatmap beatmap, ProcessingMode mode)
         {
             switch (mode)
             {
                 case ProcessingMode.All:
-                    ProcessDifficulty(beatmap);
-                    ProcessLegacyAttributes(beatmap);
+                    ProcessBeatmapDifficulty(beatmap);
+                    ProcessBeatmapLegacyAttributes(beatmap);
                     break;
 
                 case ProcessingMode.Difficulty:
-                    ProcessDifficulty(beatmap);
+                    ProcessBeatmapDifficulty(beatmap);
                     break;
 
                 case ProcessingMode.ScoreAttributes:
-                    ProcessLegacyAttributes(beatmap);
+                    ProcessBeatmapLegacyAttributes(beatmap);
                     break;
 
                 default:
@@ -65,9 +65,9 @@ namespace osu.Server.DifficultyCalculator
             }
         }
 
-        public void ProcessDifficulty(WorkingBeatmap beatmap) => run(beatmap, processDifficulty);
+        public void ProcessBeatmapDifficulty(WorkingBeatmap beatmap) => run(beatmap, processDifficulty);
 
-        public void ProcessLegacyAttributes(WorkingBeatmap beatmap) => run(beatmap, processLegacyAttributes);
+        public void ProcessBeatmapLegacyAttributes(WorkingBeatmap beatmap) => run(beatmap, processLegacyAttributes);
 
         public void NotifyBeatmapSetReprocessed(long beatmapSetId)
         {
