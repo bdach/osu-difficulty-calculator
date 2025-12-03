@@ -69,20 +69,6 @@ namespace osu.Server.DifficultyCalculator
 
         public void ProcessBeatmapLegacyAttributes(WorkingBeatmap beatmap) => run(beatmap, processLegacyAttributes);
 
-        public void NotifyBeatmapSetReprocessed(long beatmapSetId)
-        {
-            if (dryRun)
-                return;
-
-            using (var conn = DatabaseAccess.GetConnection())
-            {
-                conn.Execute(@"INSERT INTO `bss_process_queue` (`beatmapset_id`, `status`) VALUES (@beatmapset_id, 2)", new
-                {
-                    beatmapset_id = beatmapSetId,
-                });
-            }
-        }
-
         public void NotifyBeatmapReprocessed(long beatmapId)
         {
             if (dryRun)
@@ -99,6 +85,20 @@ namespace osu.Server.DifficultyCalculator
                     {
                         beatmap_id = beatmapId,
                     });
+            }
+        }
+
+        public void NotifyBeatmapSetReprocessed(long beatmapSetId)
+        {
+            if (dryRun)
+                return;
+
+            using (var conn = DatabaseAccess.GetConnection())
+            {
+                conn.Execute(@"INSERT INTO `bss_process_queue` (`beatmapset_id`, `status`) VALUES (@beatmapset_id, 2)", new
+                {
+                    beatmapset_id = beatmapSetId,
+                });
             }
         }
 
