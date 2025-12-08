@@ -98,7 +98,7 @@ namespace osu.Server.DifficultyCalculator
             using (var conn = DatabaseAccess.GetConnection())
             {
                 var beatmaps = conn.Query<osu_beatmap>(
-                                       @"SELECT `beatmap_id`, `diff_size`, `playmode`, `version`, `difficultyrating` FROM `osu_beatmaps` WHERE `beatmapset_id` = @setId",
+                                       @"SELECT `beatmap_id`, `diff_size`, `playmode`, `version`, `difficultyrating` FROM `osu_beatmaps` WHERE `beatmapset_id` = @setId AND `deleted_at` IS NULL",
                                        new { setId = beatmapSetId })
                                    .OrderBy(b => b.playmode).ThenBy(b => b.difficultyrating)
                                    .ToArray();
